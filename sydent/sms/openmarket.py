@@ -15,8 +15,11 @@
 # limitations under the License.
 
 import logging
+import random
+
 from base64 import b64encode
 
+from twilio.rest import Client
 from twisted.internet import defer, reactor
 from sydent.http.httpclient import SimpleHttpClient
 from twisted.web.http_headers import Headers
@@ -50,42 +53,9 @@ class OpenMarketSMS:
 
     @defer.inlineCallbacks
     def sendTextSMS(self, body, dest, source=None):
-        body = {
-            "mobileTerminate": {
-                "message": {
-                    "content": body,
-                    "type": "text"
-                },
-                "destination": {
-                    "address": dest,
-                }
-            },
-        }
-        if source:
-            body['mobileTerminate']['source'] = {
-                "ton": tonFromType(source['type']),
-                "address": source['text'],
-            }
+        code = str(random.randint(1000, 9999))
 
-        b64creds = b64encode(b"%s:%s" % (
-            self.sydent.cfg.get('sms', 'username'),
-            self.sydent.cfg.get('sms', 'password'),
-        ))
-        headers = Headers({
-            b"Authorization": [b"Basic " + b64creds],
-            b"Content-Type": [b"application/json"],
-        })
+        twilio = Client('ACb0db3a1cb0e879877c8c71a04d767d3a', '2d2db813eaabe3f4c2233b5f92c49943')
+        twilio.messages.create(to=dest, from_='+15717891325', body='Your code for talkermessenger registration: ' + code)
 
-        resp = yield self.http_cli.post_json_get_nothing(
-            API_BASE_URL, body, { "headers": headers }
-        )
-        headers = dict(resp.headers.getAllRawHeaders())
-
-        if 'Location' not in headers:
-            raise Exception("Got response from sending SMS with no location header")
-        # Nominally we should parse the URL, but we can just split on '/' since
-        # we only care about the last part.
-        parts = headers['Location'][0].split('/')
-        if len(parts) < 2:
-            raise Exception("Got response from sending SMS with malformed location header")
-        defer.returnValue(parts[-1])
+        defer.returnValue("hz")

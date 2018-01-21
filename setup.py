@@ -38,6 +38,7 @@ setup(
         "pyasn1",
         "pynacl",
         "daemonize",
+        "twilio",
         "phonenumbers",
     ],
     setup_requires=[
