@@ -75,7 +75,7 @@ class MsisdnValidator:
 
         msisdn = phonenumbers.format_number(
             phoneNumber, phonenumbers.PhoneNumberFormat.E164
-        )[1:]
+        )
 
         valSession = valSessionStore.getOrCreateTokenSession(
             medium='msisdn', address=msisdn, clientSecret=clientSecret
