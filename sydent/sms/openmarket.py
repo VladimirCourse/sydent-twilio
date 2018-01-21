@@ -53,9 +53,5 @@ class OpenMarketSMS:
 
     @defer.inlineCallbacks
     def sendTextSMS(self, body, dest, source=None):
-        code = str(random.randint(1000, 9999))
-
         twilio = Client('ACb0db3a1cb0e879877c8c71a04d767d3a', '2d2db813eaabe3f4c2233b5f92c49943')
-        twilio.messages.create(to=dest, from_='+15717891325', body='Your code for talkermessenger registration: ' + code)
-
-        defer.returnValue("hz")
+        twilio.messages.create(to=dest, from_='+15717891325', body=body)
