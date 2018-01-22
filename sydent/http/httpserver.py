@@ -88,10 +88,27 @@ class ClientApiHttpServer:
 
         self.factory = Site(root)
 
+    '''
     def setup(self):
         httpPort = int(self.sydent.cfg.get('http', 'clientapi.http.port'))
         logger.info("Starting Client API HTTP server on port %d", httpPort)
-        twisted.internet.reactor.listenTCP(httpPort, self.factory)
+        twisted.internet.reactor.listenTCP(httpPort, self.factory)'''
+    
+    def setup(self):
+        httpPort = int(self.sydent.cfg.get('http', 'clientapi.http.port'))
+
+        if self.sydent.sslComponents.myPrivateCertificate:
+            # We will already have logged a warn if this is absent, so don't do it again
+            cert = self.sydent.sslComponents.myPrivateCertificate
+            certOptions = twisted.internet.ssl.CertificateOptions(privateKey=cert.privateKey.original,
+                                                                  certificate=cert.original,
+                                                                  trustRoot=self.sydent.sslComponents.trustRoot)
+
+            logger.info("Loaded server private key and certificate!")
+            logger.info("Starting Replication HTTPS server on port %d", httpPort)
+
+            twisted.internet.reactor.listenSSL(httpPort, self.factory, certOptions)
+
 
 
 class ReplicationHttpsServer:
