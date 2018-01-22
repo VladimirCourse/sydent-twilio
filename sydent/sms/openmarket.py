@@ -50,7 +50,10 @@ class OpenMarketSMS:
     def __init__(self, sydent):
         self.sydent = sydent
         self.http_cli = SimpleHttpClient(sydent)
+        self.account = self.sydent.cfg.get('sms', 'account')
+        self.token = self.sydent.cfg.get('sms', 'token')
+        self.phone = self.sydent.cfg.get('sms', 'phone')
 
     def sendTextSMS(self, body, dest, source=None):
-        twilio = Client('ACb0db3a1cb0e879877c8c71a04d767d3a', '2d2db813eaabe3f4c2233b5f92c49943')
-        twilio.messages.create(to=dest, from_='+15717891325', body=body)
+        twilio = Client(self.account, self.token)
+        twilio.messages.create(to=dest, from_=self.phone, body=body)
